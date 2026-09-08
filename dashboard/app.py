@@ -5,13 +5,10 @@ from sqlalchemy import create_engine, text
 from groq import Groq
 import warnings
 warnings.filterwarnings('ignore')
-import os
-from dotenv import load_dotenv
-load_dotenv('/Users/paulamipaul/Desktop/retail-intelligence-platform/.env')
 
 st.set_page_config(page_title="Retail Intelligence Platform", layout="wide", page_icon="🛒")
 
-engine = create_engine('postgresql://paulamipaul@localhost:5432/paulamipaul')
+engine = create_engine(st.secrets['DATABASE_URL'], pool_pre_ping=True)
 
 @st.cache_data
 def load_data():
@@ -78,11 +75,11 @@ st.caption("Ask any business question about the retail data in plain English")
 question = st.text_input("Your question:", placeholder="e.g. Which sellers have the most 5-star reviews?")
 
 if question:
-    client = Groq(api_key=os.environ.get('GROQ_API_KEY'))
+    client = Groq(api_key=st.secrets['GROQ_API_KEY'])
 
     with st.spinner("Thinking..."):
         response = client.chat.completions.create(
-            model='llama-3.3-70b-versatile',
+            model='openai/gpt-oss-120b',
             messages=[
                 {
                     'role': 'user',
